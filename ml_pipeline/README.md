@@ -12,5 +12,5 @@ Geron's notebook can be found here:
 
 https://github.com/ageron/handson-ml/blob/master/02_end_to_end_machine_learning_project.ipynb
 
-A Google Colaboraty notebook can be found here
+A Google Colaboratory notebook can be found here
 https://colab.research.google.com/drive/1b7LEeGAC2NRMUIIjQn684EBHSuyx-QtU
