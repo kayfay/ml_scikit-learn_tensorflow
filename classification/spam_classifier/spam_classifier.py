@@ -3,6 +3,9 @@ import os
 import tarfile
 import numpy as np
 
+# Scientific library impots
+from scipy.sparse import csr_matrix
+
 # Email and http handling imports
 from six.moves import urllib
 import email
@@ -15,6 +18,10 @@ from collections import Counter
 # ML imports
 from sklearn.model_selection import train_test_split
 from sklearn.base import BaseEstimator, TransformerMixin
+from sklearn.pipeline import Pipeline
+from sklearn.linear_model import LogisticRegression
+from sklearn.model_selection import cross_val_score
+from sklearn.metrics import precision_score, recall_score
 
 # Natural language processing imports
 import nltk
@@ -156,6 +163,35 @@ class EmailToWordCounterTransformer(BaseEstimator, TransformerMixin):
         return np.array(X_transformed)
 
 
+# Class for creating sparse word vectors
+class WordCounterToVectorTransformer(BaseEstimator, TransformerMixin):
+    def __init__(self, vocabulatory_size):
+        self.vocabulatory_size = vocabulatory_size
+
+    def fit(self, X, y=None):
+        total_count = Counter()
+        for word_count in X:
+            for word, count in word_count.items():
+                total_count[word] += min(count, 10)
+        most_common = total_count.most_common()[:self.vocabulatory_size]
+        self.most_common = most_common
+        self.vocabulatory_ = {word: index + 1 for index, (word, count) in
+                              enumerate(most_common)}
+        return self
+
+    def transform(self, X, y=None):
+        rows = []
+        cols = []
+        data = []
+        for row, word_count in enumerate(X):
+            for word, count in word_count.items():
+                rows.append(row)
+                cols.append(self.vocabulatory_.get(word, 0))
+        return csr_matrix((data, (rows, cols)), shape=(len(X),
+                                                       self.vocabulatory_size
+                                                       + 1))
+
+
 # get data
 fetch_spam_data()
 
@@ -197,3 +233,41 @@ y = np.array([0] + len(ham_emails) + [1] * len(spam_emails))
 
 X_train, X_test, y_train, y_test = train_test_split(
     X, y, test_size=0.2, random_state=42)
+
+# Test the word counter
+X_few = X_train[:3]
+X_few_wordcounts = EmailToWordCounterTransformer().fit_transform(X_few)
+print(X_few_wordcounts, "A few wordcounts")
+
+# Test the word to vector creator
+vocab_transformer = WordCounterToVectorTransformer(vocabulatory_size=10)
+X_few_vectors = vocab_transformer.fit_transform(X_few_wordcounts)
+print(X_few_vectors.toarray(), "3 Emails by counters")
+print(vocab_transformer.vocabulatory_, "Counters and references")
+
+# Process training set
+preprocess_pipeline = Pipeline([
+    ("email_to_wordcoutn", EmailToWordCounterTransformer()),
+    ("wordcount_to_vector", WordCounterToVectorTransformer()),
+])
+
+X_train_transformed = preprocess_pipeline.fit_transform(X_train)
+
+# Train classifier on training set and generate cross validation score
+log_clf = LogisticRegression(random_state=42)
+score = cross_val_score(log_clf, X_train_transformed, y_train, cv=3, verbose=3)
+print("Classifier score", score.mean())
+
+# Process test set
+X_test_transformed = preprocess_pipeline.transform(X_test)
+
+# Train test set
+log_clf = LogisticRegression(random_state=42)
+log_clf.fit(X_train_transformed, y_train)
+
+# Create predictions
+y_pred = log_clf.predict(X_test_transformed)
+
+# Measure performance for precision / recall
+print("Precision: {:.2f}%".format(100 * precision_score(y_test, y_pred)))
+print("Recall: {.2f}%".format(100 * recall_score(y_test, y_pred)))
