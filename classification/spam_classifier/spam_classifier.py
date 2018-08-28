@@ -30,7 +30,7 @@ from html import unescape
 
 # Fetch data
 DOWNLOAD_ROOT = "http://spamassassin.apache.org/old/publiccorpus/"
-HAM_URL = DOWNLOAD_ROOT + "20030228_easy_ham_tar.bz2"
+HAM_URL = DOWNLOAD_ROOT + "20030228_easy_ham.tar.bz2"
 SPAM_URL = DOWNLOAD_ROOT + "20030228_spam.tar.bz2"
 SPAM_PATH = os.path.join("datasets", "spam")
 
@@ -39,7 +39,7 @@ HAM_DIR = os.path.join(SPAM_PATH, "easy_ham")
 SPAM_DIR = os.path.join(SPAM_PATH, "spam")
 
 # Instance declerations
-stemmer = nltk.PortStemmer()
+stemmer = nltk.PorterStemmer()
 url_extractor = urlextract.URLExtract()
 
 
@@ -83,7 +83,7 @@ def structures_counter(emails):
     for single_email in emails:
         structure = get_email_structure(single_email)
         structures[structure] += 1
-    return structure
+    return structures
 
 
 def html_to_plain_text(html):
@@ -146,8 +146,8 @@ class EmailToWordCounterTransformer(BaseEstimator, TransformerMixin):
             if self.replace_urls:
                 urls = list(set(url_extractor.find_urls(text)))
                 urls.sort(key=lambda url: len(url), reverse=True)
-            for url in urls:
-                text = text.replace(url, " URL ")
+                for url in urls:
+                    text = text.replace(url, " URL ")
             if self.replace_numbers:
                 text = re.sub(r'\d+(?:\.\d*(?:[eE]\d+))?', 'NUMBER', text)
             if self.remove_punctuation:
@@ -165,17 +165,17 @@ class EmailToWordCounterTransformer(BaseEstimator, TransformerMixin):
 
 # Class for creating sparse word vectors
 class WordCounterToVectorTransformer(BaseEstimator, TransformerMixin):
-    def __init__(self, vocabulatory_size):
-        self.vocabulatory_size = vocabulatory_size
+    def __init__(self, vocabulary_size=1000):
+        self.vocabulary_size = vocabulary_size
 
     def fit(self, X, y=None):
         total_count = Counter()
         for word_count in X:
             for word, count in word_count.items():
                 total_count[word] += min(count, 10)
-        most_common = total_count.most_common()[:self.vocabulatory_size]
+        most_common = total_count.most_common()[:self.vocabulary_size]
         self.most_common = most_common
-        self.vocabulatory_ = {word: index + 1 for index, (word, count) in
+        self.vocabulary_ = {word: index + 1 for index, (word, count) in
                               enumerate(most_common)}
         return self
 
@@ -186,9 +186,10 @@ class WordCounterToVectorTransformer(BaseEstimator, TransformerMixin):
         for row, word_count in enumerate(X):
             for word, count in word_count.items():
                 rows.append(row)
-                cols.append(self.vocabulatory_.get(word, 0))
+                cols.append(self.vocabulary_.get(word, 0))
+                data.append(count)
         return csr_matrix((data, (rows, cols)), shape=(len(X),
-                                                       self.vocabulatory_size
+                                                       self.vocabulary_size
                                                        + 1))
 
 
@@ -207,8 +208,8 @@ spam_emails = [load_email(is_spam=True, filename=name)
 
 
 # Check files lenghts
-len(ham_filenames)   # 2500
-len(spam_filenames)  # 500
+print("length ham", len(ham_filenames))   # 2500
+print("length spam", len(spam_filenames))  # 500
 
 # View an email
 print(ham_emails[1].get_content().strip())
@@ -229,7 +230,7 @@ spam_emails[0]["From"]      # 12a1mailbot1@web.de
 
 # Create test / train splits
 X = np.array(ham_emails + spam_emails)
-y = np.array([0] + len(ham_emails) + [1] * len(spam_emails))
+y = np.array([0] * len(ham_emails) + [1] * len(spam_emails))
 
 X_train, X_test, y_train, y_test = train_test_split(
     X, y, test_size=0.2, random_state=42)
@@ -240,14 +241,14 @@ X_few_wordcounts = EmailToWordCounterTransformer().fit_transform(X_few)
 print(X_few_wordcounts, "A few wordcounts")
 
 # Test the word to vector creator
-vocab_transformer = WordCounterToVectorTransformer(vocabulatory_size=10)
+vocab_transformer = WordCounterToVectorTransformer(vocabulary_size=10)
 X_few_vectors = vocab_transformer.fit_transform(X_few_wordcounts)
 print(X_few_vectors.toarray(), "3 Emails by counters")
-print(vocab_transformer.vocabulatory_, "Counters and references")
+print(vocab_transformer.vocabulary_, "Counters and references")
 
 # Process training set
 preprocess_pipeline = Pipeline([
-    ("email_to_wordcoutn", EmailToWordCounterTransformer()),
+    ("email_to_wordcount", EmailToWordCounterTransformer()),
     ("wordcount_to_vector", WordCounterToVectorTransformer()),
 ])
 
@@ -270,4 +271,4 @@ y_pred = log_clf.predict(X_test_transformed)
 
 # Measure performance for precision / recall
 print("Precision: {:.2f}%".format(100 * precision_score(y_test, y_pred)))
-print("Recall: {.2f}%".format(100 * recall_score(y_test, y_pred)))
+print("Recall: {:.2f}%".format(100 * recall_score(y_test, y_pred)))
