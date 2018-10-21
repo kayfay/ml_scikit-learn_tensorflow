@@ -1,0 +1,22 @@
+digraph G {
+	graph [color=white fillcolor=white fontcolor="#414141" style=rounded]
+	node [color="#aaaaaa" fillcolor=white fontcolor="#414141" penwidth=2 style=filled]
+	edge [arrowsize=1.2 color="#aaaaaa" fontcolor="#414141" penwidth=2.5]
+	relu_2 [label=relu_2]
+	relu [label=relu]
+	relu_3 [label=relu_3]
+	output [label=output]
+	relu_1 [label=relu_1]
+	relu_4 [label=relu_4]
+	X [label=X]
+	X -> relu_2 [label="?×3"]
+	X -> relu [label="?×3"]
+	X -> relu_3 [label="?×3"]
+	relu_2 -> output
+	relu_1 -> output
+	relu_4 -> output
+	relu -> output
+	relu_3 -> output
+	X -> relu_1 [label="?×3"]
+	X -> relu_4 [label="?×3"]
+}

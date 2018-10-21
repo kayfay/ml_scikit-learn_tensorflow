@@ -1,0 +1,320 @@
+digraph G {
+	graph [color=white fillcolor=white fontcolor="#414141" style=rounded]
+	node [color="#aaaaaa" fillcolor=white fontcolor="#414141" penwidth=2 style=filled]
+	edge [arrowsize=1.2 color="#aaaaaa" fontcolor="#414141" penwidth=2.5]
+	X [label=X]
+	y [label=y]
+	init [label=init]
+	subgraph cluster_0 {
+		graph [bgcolor="#eeeeee" color="#aaaaaa" fontcolor="#414141" label=save penwidth=2 style=rounded]
+		node [color="#aaaaaa" fillcolor=white fontcolor="#414141" penwidth=2 style=filled]
+		edge [arrowsize=1.2 color="#aaaaaa" fontcolor="#414141" penwidth=2.5]
+		"save/Assign_2" [label=Assign_2]
+		"save/Const" [label=Const]
+		"save/Assign_4" [label=Assign_4]
+		"save/restore_all" [label=restore_all]
+		"save/Assign_1" [label=Assign_1]
+		"save/Assign" [label=Assign]
+		"save/Assign_3" [label=Assign_3]
+		"save/control_dependency" [label=control_dependency]
+		"save/Assign_5" [label=Assign_5]
+		subgraph cluster_0 {
+			graph [bgcolor="#eeeeee" color="#aaaaaa" fontcolor="#414141" label=SaveV2 penwidth=2 style=rounded]
+			node [color="#aaaaaa" fillcolor=white fontcolor="#414141" penwidth=2 style=filled]
+			edge [arrowsize=1.2 color="#aaaaaa" fontcolor="#414141" penwidth=2.5]
+			"save/SaveV2/shape_and_slices" [label=shape_and_slices]
+			"save/SaveV2/tensor_names" [label=tensor_names]
+			"save/SaveV2" [label=SaveV2]
+		}
+		subgraph cluster_1 {
+			graph [bgcolor="#eeeeee" color="#aaaaaa" fontcolor="#414141" label=RestoreV2 penwidth=2 style=rounded]
+			node [color="#aaaaaa" fillcolor=white fontcolor="#414141" penwidth=2 style=filled]
+			edge [arrowsize=1.2 color="#aaaaaa" fontcolor="#414141" penwidth=2.5]
+			"save/RestoreV2/tensor_names" [label=tensor_names]
+			"save/RestoreV2/shape_and_slices" [label=shape_and_slices]
+			"save/RestoreV2" [label=RestoreV2]
+		}
+		save [label=save]
+	}
+	subgraph cluster_3 {
+		graph [bgcolor="#eeeeee" color="#aaaaaa" fontcolor="#414141" label=hidden1 penwidth=2 style=rounded]
+		node [color="#aaaaaa" fillcolor=white fontcolor="#414141" penwidth=2 style=filled]
+		edge [arrowsize=1.2 color="#aaaaaa" fontcolor="#414141" penwidth=2.5]
+		subgraph cluster_3 {
+			graph [bgcolor="#eeeeee" color="#aaaaaa" fontcolor="#414141" label=bias penwidth=2 style=rounded]
+			node [color="#aaaaaa" fillcolor=white fontcolor="#414141" penwidth=2 style=filled]
+			edge [arrowsize=1.2 color="#aaaaaa" fontcolor="#414141" penwidth=2.5]
+			"hidden1/bias/Initializer" [label=Initializer]
+			"hidden1/bias/Assign" [label=Assign]
+			"hidden1/bias/read" [label=read]
+			"hidden1/bias" [label=bias]
+		}
+		subgraph cluster_4 {
+			graph [bgcolor="#eeeeee" color="#aaaaaa" fontcolor="#414141" label=kernel penwidth=2 style=rounded]
+			node [color="#aaaaaa" fillcolor=white fontcolor="#414141" penwidth=2 style=filled]
+			edge [arrowsize=1.2 color="#aaaaaa" fontcolor="#414141" penwidth=2.5]
+			"hidden1/kernel/Assign" [label=Assign]
+			"hidden1/kernel/Initializer" [label=Initializer]
+			"hidden1/kernel/read" [label=read]
+			"hidden1/kernel" [label=kernel]
+		}
+		hidden1 [label=hidden1]
+	}
+	subgraph cluster_6 {
+		graph [bgcolor="#eeeeee" color="#aaaaaa" fontcolor="#414141" label=loss penwidth=2 style=rounded]
+		node [color="#aaaaaa" fillcolor=white fontcolor="#414141" penwidth=2 style=filled]
+		edge [arrowsize=1.2 color="#aaaaaa" fontcolor="#414141" penwidth=2.5]
+		"loss/Const" [label=Const]
+		"loss/loss" [label=loss]
+		subgraph cluster_6 {
+			graph [bgcolor="#eeeeee" color="#aaaaaa" fontcolor="#414141" label=SparseSoftmaxCrossEntropyWithLogits penwidth=2 style=rounded]
+			node [color="#aaaaaa" fillcolor=white fontcolor="#414141" penwidth=2 style=filled]
+			edge [arrowsize=1.2 color="#aaaaaa" fontcolor="#414141" penwidth=2.5]
+			"loss/SparseSoftmaxCrossEntropyWithLogits/SparseSoftmaxCrossEntropyWithLogits" [label=SparseSoftmaxCrossEntropyWithLogits]
+			"loss/SparseSoftmaxCrossEntropyWithLogits/Shape" [label=Shape]
+			"loss/SparseSoftmaxCrossEntropyWithLogits" [label=SparseSoftmaxCrossEntropyWithLogits]
+		}
+		loss [label=loss]
+	}
+	subgraph cluster_8 {
+		graph [bgcolor="#eeeeee" color="#aaaaaa" fontcolor="#414141" label=dnn penwidth=2 style=rounded]
+		node [color="#aaaaaa" fillcolor=white fontcolor="#414141" penwidth=2 style=filled]
+		edge [arrowsize=1.2 color="#aaaaaa" fontcolor="#414141" penwidth=2.5]
+		subgraph cluster_8 {
+			graph [bgcolor="#eeeeee" color="#aaaaaa" fontcolor="#414141" label=hidden1 penwidth=2 style=rounded]
+			node [color="#aaaaaa" fillcolor=white fontcolor="#414141" penwidth=2 style=filled]
+			edge [arrowsize=1.2 color="#aaaaaa" fontcolor="#414141" penwidth=2.5]
+			"dnn/hidden1/MatMul" [label=MatMul]
+			"dnn/hidden1/mul" [label=mul]
+			"dnn/hidden1/BiasAdd" [label=BiasAdd]
+			"dnn/hidden1/Maximum" [label=Maximum]
+			"dnn/hidden1" [label=hidden1]
+		}
+		subgraph cluster_9 {
+			graph [bgcolor="#eeeeee" color="#aaaaaa" fontcolor="#414141" label=outputs penwidth=2 style=rounded]
+			node [color="#aaaaaa" fillcolor=white fontcolor="#414141" penwidth=2 style=filled]
+			edge [arrowsize=1.2 color="#aaaaaa" fontcolor="#414141" penwidth=2.5]
+			"dnn/outputs/MatMul" [label=MatMul]
+			"dnn/outputs/BiasAdd" [label=BiasAdd]
+			"dnn/outputs" [label=outputs]
+		}
+		subgraph cluster_10 {
+			graph [bgcolor="#eeeeee" color="#aaaaaa" fontcolor="#414141" label=hidden2 penwidth=2 style=rounded]
+			node [color="#aaaaaa" fillcolor=white fontcolor="#414141" penwidth=2 style=filled]
+			edge [arrowsize=1.2 color="#aaaaaa" fontcolor="#414141" penwidth=2.5]
+			"dnn/hidden2/mul" [label=mul]
+			"dnn/hidden2/Maximum" [label=Maximum]
+			"dnn/hidden2/MatMul" [label=MatMul]
+			"dnn/hidden2/BiasAdd" [label=BiasAdd]
+			"dnn/hidden2" [label=hidden2]
+		}
+		dnn [label=dnn]
+	}
+	subgraph cluster_12 {
+		graph [bgcolor="#eeeeee" color="#aaaaaa" fontcolor="#414141" label=hidden2 penwidth=2 style=rounded]
+		node [color="#aaaaaa" fillcolor=white fontcolor="#414141" penwidth=2 style=filled]
+		edge [arrowsize=1.2 color="#aaaaaa" fontcolor="#414141" penwidth=2.5]
+		subgraph cluster_12 {
+			graph [bgcolor="#eeeeee" color="#aaaaaa" fontcolor="#414141" label=kernel penwidth=2 style=rounded]
+			node [color="#aaaaaa" fillcolor=white fontcolor="#414141" penwidth=2 style=filled]
+			edge [arrowsize=1.2 color="#aaaaaa" fontcolor="#414141" penwidth=2.5]
+			"hidden2/kernel/Assign" [label=Assign]
+			"hidden2/kernel/Initializer" [label=Initializer]
+			"hidden2/kernel/read" [label=read]
+			"hidden2/kernel" [label=kernel]
+		}
+		subgraph cluster_13 {
+			graph [bgcolor="#eeeeee" color="#aaaaaa" fontcolor="#414141" label=bias penwidth=2 style=rounded]
+			node [color="#aaaaaa" fillcolor=white fontcolor="#414141" penwidth=2 style=filled]
+			edge [arrowsize=1.2 color="#aaaaaa" fontcolor="#414141" penwidth=2.5]
+			"hidden2/bias/Assign" [label=Assign]
+			"hidden2/bias/Initializer" [label=Initializer]
+			"hidden2/bias/read" [label=read]
+			"hidden2/bias" [label=bias]
+		}
+		hidden2 [label=hidden2]
+	}
+	subgraph cluster_15 {
+		graph [bgcolor="#eeeeee" color="#aaaaaa" fontcolor="#414141" label=train penwidth=2 style=rounded]
+		node [color="#aaaaaa" fillcolor=white fontcolor="#414141" penwidth=2 style=filled]
+		edge [arrowsize=1.2 color="#aaaaaa" fontcolor="#414141" penwidth=2.5]
+		subgraph cluster_15 {
+			graph [bgcolor="#eeeeee" color="#aaaaaa" fontcolor="#414141" label=GradientDescent penwidth=2 style=rounded]
+			node [color="#aaaaaa" fillcolor=white fontcolor="#414141" penwidth=2 style=filled]
+			edge [arrowsize=1.2 color="#aaaaaa" fontcolor="#414141" penwidth=2.5]
+			"train/GradientDescent/update_hidden2" [label=update_hidden2]
+			"train/GradientDescent/update_outputs" [label=update_outputs]
+			"train/GradientDescent/update_hidden1" [label=update_hidden1]
+			"train/GradientDescent/learning_rate" [label=learning_rate]
+			"train/GradientDescent" [label=GradientDescent]
+		}
+		subgraph cluster_16 {
+			graph [bgcolor="#eeeeee" color="#aaaaaa" fontcolor="#414141" label=gradients penwidth=2 style=rounded]
+			node [color="#aaaaaa" fillcolor=white fontcolor="#414141" penwidth=2 style=filled]
+			edge [arrowsize=1.2 color="#aaaaaa" fontcolor="#414141" penwidth=2.5]
+			"train/gradients/zeros_like" [label=zeros_like]
+			"train/gradients/grad_ys_0" [label=grad_ys_0]
+			"train/gradients/dnn" [label=dnn]
+			"train/gradients/Fill" [label=Fill]
+			"train/gradients/loss" [label=loss]
+			"train/gradients/AddN" [label=AddN]
+			"train/gradients/AddN_1" [label=AddN_1]
+			"train/gradients/Shape" [label=Shape]
+			"train/gradients" [label=gradients]
+		}
+		train [label=train]
+	}
+	subgraph cluster_18 {
+		graph [bgcolor="#eeeeee" color="#aaaaaa" fontcolor="#414141" label=eval penwidth=2 style=rounded]
+		node [color="#aaaaaa" fillcolor=white fontcolor="#414141" penwidth=2 style=filled]
+		edge [arrowsize=1.2 color="#aaaaaa" fontcolor="#414141" penwidth=2.5]
+		"eval/acc" [label=acc]
+		"eval/Cast" [label=Cast]
+		"eval/Const" [label=Const]
+		subgraph cluster_18 {
+			graph [bgcolor="#eeeeee" color="#aaaaaa" fontcolor="#414141" label=in_top_k penwidth=2 style=rounded]
+			node [color="#aaaaaa" fillcolor=white fontcolor="#414141" penwidth=2 style=filled]
+			edge [arrowsize=1.2 color="#aaaaaa" fontcolor="#414141" penwidth=2.5]
+			"eval/in_top_k/InTopKV2" [label=InTopKV2]
+			"eval/in_top_k" [label=in_top_k]
+		}
+		subgraph cluster_19 {
+			graph [bgcolor="#eeeeee" color="#aaaaaa" fontcolor="#414141" label=acc_1 penwidth=2 style=rounded]
+			node [color="#aaaaaa" fillcolor=white fontcolor="#414141" penwidth=2 style=filled]
+			edge [arrowsize=1.2 color="#aaaaaa" fontcolor="#414141" penwidth=2.5]
+			"eval/acc_1/tags" [label=tags]
+			"eval/acc_1" [label=acc_1]
+		}
+		eval [label=eval]
+	}
+	subgraph cluster_21 {
+		graph [bgcolor="#eeeeee" color="#aaaaaa" fontcolor="#414141" label=outputs penwidth=2 style=rounded]
+		node [color="#aaaaaa" fillcolor=white fontcolor="#414141" penwidth=2 style=filled]
+		edge [arrowsize=1.2 color="#aaaaaa" fontcolor="#414141" penwidth=2.5]
+		subgraph cluster_21 {
+			graph [bgcolor="#eeeeee" color="#aaaaaa" fontcolor="#414141" label=bias penwidth=2 style=rounded]
+			node [color="#aaaaaa" fillcolor=white fontcolor="#414141" penwidth=2 style=filled]
+			edge [arrowsize=1.2 color="#aaaaaa" fontcolor="#414141" penwidth=2.5]
+			"outputs/bias/Initializer" [label=Initializer]
+			"outputs/bias/read" [label=read]
+			"outputs/bias/Assign" [label=Assign]
+			"outputs/bias" [label=bias]
+		}
+		subgraph cluster_22 {
+			graph [bgcolor="#eeeeee" color="#aaaaaa" fontcolor="#414141" label=kernel penwidth=2 style=rounded]
+			node [color="#aaaaaa" fillcolor=white fontcolor="#414141" penwidth=2 style=filled]
+			edge [arrowsize=1.2 color="#aaaaaa" fontcolor="#414141" penwidth=2.5]
+			"outputs/kernel/Initializer" [label=Initializer]
+			"outputs/kernel/read" [label=read]
+			"outputs/kernel/Assign" [label=Assign]
+			"outputs/kernel" [label=kernel]
+		}
+		outputs [label=outputs]
+	}
+	"hidden1/kernel/Initializer" -> "hidden1/kernel/Assign"
+	"hidden1/kernel" -> "hidden1/kernel/Assign" [label="784×300"]
+	"hidden2/bias" -> "save/Assign_2" [label=100]
+	"save/RestoreV2":2 -> "save/Assign_2"
+	"train/GradientDescent/learning_rate" -> "train/GradientDescent/update_outputs" [label=""]
+	"outputs/bias" -> "train/GradientDescent/update_outputs" [label=10]
+	"train/gradients/dnn" -> "train/GradientDescent/update_outputs"
+	"outputs/kernel" -> "train/GradientDescent/update_outputs" [label="100×10"]
+	"dnn/hidden2/MatMul" -> "dnn/hidden2/BiasAdd" [label="?×100"]
+	"hidden2/bias/read" -> "dnn/hidden2/BiasAdd" [label=100]
+	"loss/SparseSoftmaxCrossEntropyWithLogits/SparseSoftmaxCrossEntropyWithLogits":1 -> "train/gradients/loss"
+	"loss/SparseSoftmaxCrossEntropyWithLogits/SparseSoftmaxCrossEntropyWithLogits" -> "train/gradients/loss" [label="?×10"]
+	"train/gradients/Fill" -> "train/gradients/loss" [label=""]
+	"dnn/hidden2/Maximum" -> "dnn/outputs/MatMul" [label="?×100"]
+	"outputs/kernel/read" -> "dnn/outputs/MatMul" [label="100×10"]
+	"outputs/bias" -> "save/Assign_4" [label=10]
+	"save/RestoreV2":4 -> "save/Assign_4"
+	"train/gradients/grad_ys_0" -> "train/gradients/Fill" [label=""]
+	"train/gradients/Shape" -> "train/gradients/Fill" [label=0]
+	"save/RestoreV2/tensor_names" -> "save/RestoreV2" [label=6]
+	"save/Const" -> "save/RestoreV2" [label=""]
+	"save/RestoreV2/shape_and_slices" -> "save/RestoreV2" [label=6]
+	y -> "loss/SparseSoftmaxCrossEntropyWithLogits/Shape" [label=""]
+	"dnn/hidden1/mul" -> "dnn/hidden1/Maximum" [label="?×300"]
+	"dnn/hidden1/BiasAdd" -> "dnn/hidden1/Maximum" [label="?×300"]
+	"hidden2/kernel" -> "train/GradientDescent/update_hidden2" [label="300×100"]
+	"hidden2/bias" -> "train/GradientDescent/update_hidden2" [label=100]
+	"train/gradients/dnn" -> "train/GradientDescent/update_hidden2"
+	"train/GradientDescent/learning_rate" -> "train/GradientDescent/update_hidden2" [label=""]
+	"outputs/kernel" -> "outputs/kernel/read" [label="100×10"]
+	"outputs/bias" -> "outputs/bias/read" [label=10]
+	"dnn/hidden1/BiasAdd" -> "dnn/hidden1/mul" [label="?×300"]
+	"hidden1/bias" -> "hidden1/bias/read" [label=300]
+	"hidden2/kernel/read" -> "dnn/hidden2/MatMul" [label="300×100"]
+	"dnn/hidden1/Maximum" -> "dnn/hidden2/MatMul" [label="?×300"]
+	"hidden2/kernel" -> "save/Assign_3" [label="300×100"]
+	"save/RestoreV2":3 -> "save/Assign_3"
+	"train/GradientDescent/learning_rate" -> "train/GradientDescent/update_hidden1" [label=""]
+	"hidden1/bias" -> "train/GradientDescent/update_hidden1" [label=300]
+	"train/gradients/dnn" -> "train/GradientDescent/update_hidden1"
+	"hidden1/kernel" -> "train/GradientDescent/update_hidden1" [label="784×300"]
+	"save/Const" -> "save/control_dependency" [label=""]
+	"outputs/bias/Initializer" -> "outputs/bias/Assign"
+	"outputs/bias" -> "outputs/bias/Assign" [label=10]
+	"outputs/kernel/Initializer" -> "outputs/kernel/Assign"
+	"outputs/kernel" -> "outputs/kernel/Assign" [label="100×10"]
+	"hidden2/bias" -> "hidden2/bias/Assign" [label=100]
+	"hidden2/bias/Initializer" -> "hidden2/bias/Assign"
+	"dnn/outputs/MatMul" -> "dnn/outputs/BiasAdd" [label="?×10"]
+	"outputs/bias/read" -> "dnn/outputs/BiasAdd" [label=10]
+	"dnn/hidden1/MatMul" -> "dnn/hidden1/BiasAdd" [label="?×300"]
+	"hidden1/bias/read" -> "dnn/hidden1/BiasAdd" [label=300]
+	"hidden2/kernel" -> "hidden2/kernel/read" [label="300×100"]
+	"dnn/hidden2/BiasAdd" -> "dnn/hidden2/Maximum" [label="?×100"]
+	"dnn/hidden2/mul" -> "dnn/hidden2/Maximum" [label="?×100"]
+	"save/RestoreV2":1 -> "save/Assign_1"
+	"hidden1/kernel" -> "save/Assign_1" [label="784×300"]
+	"eval/Cast" -> "eval/acc" [label="?"]
+	"eval/Const" -> "eval/acc" [label=1]
+	"save/RestoreV2" -> "save/Assign" [label=""]
+	"hidden1/bias" -> "save/Assign" [label=300]
+	X -> "dnn/hidden1/MatMul" [label="?×784"]
+	"hidden1/kernel/read" -> "dnn/hidden1/MatMul" [label="784×300"]
+	"train/gradients/dnn" -> "train/gradients/AddN_1"
+	"loss/SparseSoftmaxCrossEntropyWithLogits/SparseSoftmaxCrossEntropyWithLogits":1 -> "train/gradients/zeros_like"
+	"eval/in_top_k/InTopKV2" -> "eval/Cast" [label="?"]
+	"eval/acc" -> "eval/acc_1" [label=""]
+	"eval/acc_1/tags" -> "eval/acc_1" [label=""]
+	"dnn/hidden2/BiasAdd" -> "dnn/hidden2/mul" [label="?×100"]
+	"hidden1/bias/Initializer" -> "hidden1/bias/Assign"
+	"hidden1/bias" -> "hidden1/bias/Assign" [label=300]
+	X -> "train/gradients/dnn" [label="?×784"]
+	"outputs/kernel/read" -> "train/gradients/dnn" [label="100×10"]
+	"dnn/hidden2/mul" -> "train/gradients/dnn" [label="?×100"]
+	"train/gradients/loss" -> "train/gradients/dnn"
+	"dnn/hidden2/BiasAdd" -> "train/gradients/dnn" [label="?×100"]
+	"hidden2/kernel/read" -> "train/gradients/dnn" [label="300×100"]
+	"dnn/hidden1/BiasAdd" -> "train/gradients/dnn" [label="?×300"]
+	"dnn/hidden2/Maximum" -> "train/gradients/dnn" [label="?×100"]
+	"dnn/hidden1/Maximum" -> "train/gradients/dnn" [label="?×300"]
+	"hidden1/kernel/read" -> "train/gradients/dnn" [label="784×300"]
+	"train/gradients/AddN_1" -> "train/gradients/dnn" [label="?×300"]
+	"dnn/hidden1/mul" -> "train/gradients/dnn" [label="?×300"]
+	"train/gradients/AddN" -> "train/gradients/dnn" [label="?×100"]
+	"hidden2/bias" -> "hidden2/bias/read" [label=100]
+	"save/RestoreV2":5 -> "save/Assign_5"
+	"outputs/kernel" -> "save/Assign_5" [label="100×10"]
+	y -> "loss/SparseSoftmaxCrossEntropyWithLogits/SparseSoftmaxCrossEntropyWithLogits" [label=""]
+	"dnn/outputs/BiasAdd" -> "loss/SparseSoftmaxCrossEntropyWithLogits/SparseSoftmaxCrossEntropyWithLogits" [label="?×10"]
+	"train/gradients/dnn" -> "train/gradients/AddN"
+	"hidden1/kernel" -> "hidden1/kernel/read" [label="784×300"]
+	y -> "eval/in_top_k/InTopKV2" [label=""]
+	"dnn/outputs/BiasAdd" -> "eval/in_top_k/InTopKV2" [label="?×10"]
+	"hidden2/bias" -> "save/SaveV2" [label=100]
+	"hidden1/bias" -> "save/SaveV2" [label=300]
+	"outputs/kernel" -> "save/SaveV2" [label="100×10"]
+	"save/Const" -> "save/SaveV2" [label=""]
+	"hidden2/kernel" -> "save/SaveV2" [label="300×100"]
+	"save/SaveV2/shape_and_slices" -> "save/SaveV2" [label=6]
+	"hidden1/kernel" -> "save/SaveV2" [label="784×300"]
+	"outputs/bias" -> "save/SaveV2" [label=10]
+	"save/SaveV2/tensor_names" -> "save/SaveV2" [label=6]
+	"hidden2/kernel" -> "hidden2/kernel/Assign" [label="300×100"]
+	"hidden2/kernel/Initializer" -> "hidden2/kernel/Assign"
+	"loss/Const" -> "loss/loss" [label=1]
+	"loss/SparseSoftmaxCrossEntropyWithLogits/SparseSoftmaxCrossEntropyWithLogits" -> "loss/loss" [label="?×10"]
+}
