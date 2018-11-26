@@ -8,30 +8,31 @@ import webbrowser
 
 # Data Science Imports
 import tensorflow as tf
+from tensorflow.examples.tutorials.mnist import input_data
 
 # Graph Imports
 import tfgraphviz as tfg
-import matplotlib.pyplot as plt
-plt.rcParams['axes.labelsize'] = 14
-plt.rcParams['xtick.labelsize'] = 12
-plt.rcParams['ytick.labelsize'] = 12
 
 # Config
-PROJECT_DIR = os.path.dirname(os.path.realpath(__file__))
+PROJECT_ROOT_DIR = os.path.dirname(os.path.realpath(__file__))
 
+# Hyperparameters
+
+# Neural Network Hyperparameters
+n_steps = 28
+n_inputs = 28
+n_outputs = 10
+n_neurons = 100
+n_layers = 3
+
+# Optimization Hyperparameters
+learning_rate = 0.001
+
+# Session Batch Hyperparameters
+n_epochs = 10
+batch_size = 150
 
 # Declare Functions
-def save_fig(fig_id, tight_layout=True):
-    if not os.path.exists('images'):
-        os.makedirs('images')
-    path = os.path.join(PROJECT_DIR, 'images', fig_id, ".png")
-    plt.savefig(path, format='png', dpi=300)
-
-
-def reset_graph(seed=42):
-    tf.reset_default_graph()
-    tf.set_random_seed(seed)
-    np.random.seed(seed)
 
 
 def strip_consts(graph_def, max_const_size=32):
@@ -87,12 +88,14 @@ def show_graph(graph_def, graph_title=False, max_const_size=32):
         <iframe seamless style="width:1800px;height:1620px;border:0" srcdoc="{}"></iframe>
     """.format(code.replace('"', '&quot;'))
 
+    os.makedirs('html', exist_ok=True)
+
     if not graph_title:
         graph_file = open('graph.html', 'w')
-        filename = os.path.join(PROJECT_DIR, 'graph.html')
+        filename = os.path.join(PROJECT_ROOT_DIR, 'html', 'graph.html')
     else:
         graph_file = open(graph_title, 'w')
-        filename = os.path.join(PROJECT_DIR, graph_title)
+        filename = os.path.join(PROJECT_ROOT_DIR, 'html', graph_title)
 
     with graph_file as g:
         g.write(iframe)
@@ -104,34 +107,43 @@ def show_graph(graph_def, graph_title=False, max_const_size=32):
     tfg.board(graph, depth=2).view()
 
 
-# Hyperparameters
-# Network parameters
-n_inputs = 3
-n_neurons = 5
-
 # Data
-X0_batch = np.array([[0, 1, 2], [3, 4, 5], [6, 7, 8], [9, 0, 1]])
-X1_batch = np.array([[9, 8, 7], [0, 0, 0], [6, 5, 4], [3, 2, 1]])
+mnist = input_data.read_data_sets("/tmp/data")
+X_test = mnist.test.images.reshape((-1, n_steps, n_inputs))
+y_test = mnist.test.labels
 
 # Neural Network
-X0 = tf.placeholder(tf.float32, [None, n_inputs])
-X1 = tf.placeholder(tf.float32, [None, n_inputs])
+X = tf.placeholder(tf.float32, [None, n_steps, n_inputs])
+y = tf.placeholder(tf.int32, [None])
 
-basic_cell = tf.contrib.rnn.BasicRNNCell(num_units=n_neurons)
-output_seqs, states = tf.contrib.rnn.static_rnn(
-    basic_cell, [X0, X1], dtype=tf.float32)
+layers = [
+    tf.nn.rnn_cell.BasicRNNCell(num_units=n_neurons, activation=tf.nn.relu)
+    for layer in range(n_layers)
+]
+multi_layer_cell = tf.nn.rnn_cell.MultiRNNCell(layers)
+outputs, states = tf.nn.dynamic_rnn(multi_layer_cell, X, dtype=tf.float32)
 
-Y0, Y1 = output_seqs
+states_concat = tf.concat(axis=1, values=states)
+logits = tf.layers.dense(states_concat, n_outputs)
+xentropy = tf.nn.sparse_softmax_cross_entropy_with_logits(
+    labels=y, logits=logits)
+loss = tf.reduce_mean(xentropy)
+optimizer = tf.train.AdamOptimizer(learning_rate=learning_rate)
+training_op = optimizer.minimize(loss)
+correct = tf.nn.in_top_k(logits, y, 1)
+accuracy = tf.reduce_mean(tf.cast(correct, tf.float32))
 
-# Network initialization
+# Initialize the network nodes for operations
 init = tf.global_variables_initializer()
 
-# Run model
+# Train network in batches
 with tf.Session() as sess:
     init.run()
-    Y0_val, Y1_val = sess.run([Y0, Y1], feed_dict={X0: X0_batch, X1: X1_batch})
-
-print("Model outputs at t_0:\n", Y0_val, "\nModel outputs at t_1\n", Y1_val)
-
-show_graph(
-    tf.get_default_graph().as_graph_def(), graph_title='static_rnn_tf.html')
+    for epoch in range(n_epochs):
+        for iteration in range(mnist.train.num_examples // batch_size):
+            X_batch, y_batch = mnist.train.next_batch(batch_size)
+            X_batch = X_batch.reshape((-1, n_steps, n_inputs))
+            sess.run(training_op, feed_dict={X: X_batch, y: y_batch})
+        acc_train = accuracy.eval(feed_dict={X: X_batch, y: y_batch})
+        acc_test = accuracy.eval(feed_dict={X: X_test, y: y_test})
+        print(epoch, "Train accuracy", acc_train, "Test accuracy:", acc_test)

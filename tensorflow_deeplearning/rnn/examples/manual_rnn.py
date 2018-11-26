@@ -18,20 +18,6 @@ plt.rcParams['ytick.labelsize'] = 12
 PROJECT_ROOT_DIR = os.path.dirname(os.path.realpath(__file__))
 
 
-# Declare Functions
-def save_fig(fig_id, tight_layout=True):
-    if not os.path.exists('images'):
-        os.makedirs('images')
-    path = os.path.join(PROJECT_ROOT_DIR, 'images', fig_id, ".png")
-    plt.savefig(path, format='png', dpi=300)
-
-
-def reset_graph(seed=42):
-    tf.reset_default_graph()
-    tf.set_random_seed(seed)
-    np.random.seed(seed)
-
-
 # Hyperparameters
 # Network parameters
 n_inputs = 3
