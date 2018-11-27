@@ -1,4 +1,4 @@
-# machine learning scikit-learn scripts
+# machine learning, scikit-learn, numpy, pandas, tensorflow scripts
 # deep learning tensorflow scripts
 
 This repo contains some machine learning and deep learning python code created for study and research projects from
