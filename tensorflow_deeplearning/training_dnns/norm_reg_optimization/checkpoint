@@ -1,2 +1,0 @@
-model_checkpoint_path: "max_norm_model_final.ckpt"
-all_model_checkpoint_paths: "max_norm_model_final.ckpt"

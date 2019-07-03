@@ -1,2 +1,0 @@
-model_checkpoint_path: "dl_mnist_model_5_to_9_four_frozen"
-all_model_checkpoint_paths: "dl_mnist_model_5_to_9_four_frozen"
